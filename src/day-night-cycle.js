@@ -14,7 +14,7 @@ Hooks.once('init', async () => {
 
 Hooks.on("ready", () => {
 
-    if (game.settings.get("day-night-cycle", "first-load")){
+    if (game.settings.get("day-night-cycle", "first-load") && game.user.isGM){
         let message = "Hi,<br>Thanks for installing Day Night Cycle<br>I recommend you goto<br>https://sdoehren.com/daynightcycle<br>" +
             "before you make any changes to the default settings.<br>This message will not be shown again.<br>" +
             "All the best,<br>SDoehren<br>Discord Server: https://discord.gg/QNQZwGGxuN"
@@ -157,19 +157,65 @@ Hooks.once("init", () => {
 
 })
 
+
+Hooks.once("canvasReady",async (canvas)=>{
+
+    let DNCflags = canvas.scene.data.flags["day-night-cycle"]
+    if (DNCflags === undefined){
+        console.log('day-night-cycle | setting flags');
+        canvas.scene.setFlag("day-night-cycle", "active", game.settings.get("day-night-cycle", "default-on"))
+        canvas.scene.setFlag("day-night-cycle", "sd", game.settings.get("day-night-cycle", "sd"))
+        canvas.scene.setFlag("day-night-cycle", "stepsize", game.settings.get("day-night-cycle", "stepsize"))
+        canvas.scene.setFlag("day-night-cycle", "default", true)
+        return;
+    }
+
+    let currentactiveflag = DNCflags.active;
+    let sd = DNCflags.active;
+    let stepsize= DNCflags.active;
+    let defaultmode= DNCflags.default;
+
+    if (currentactiveflag === undefined){
+        console.log('day-night-cycle | setting active flag');
+        canvas.scene.setFlag("day-night-cycle", "active", game.settings.get("day-night-cycle", "default-on"))
+    }
+
+    if (sd === undefined){
+        console.log('day-night-cycle | setting sd flag');
+        canvas.scene.setFlag("day-night-cycle", "sd", game.settings.get("day-night-cycle", "sd"))
+    }
+
+    if (stepsize === undefined){
+        console.log('day-night-cycle | setting stepsize flag');
+        canvas.scene.setFlag("day-night-cycle", "stepsize", game.settings.get("day-night-cycle", "stepsize"))
+    }
+
+    if (defaultmode === undefined){
+        console.log('day-night-cycle | setting default flag');
+        canvas.scene.setFlag("day-night-cycle", "default", true)
+    }
+})
+
+
+
+
 Hooks.on('updateWorldTime', async (timestamp,stepsize) => {
     if (game.scenes.active.data.flags["day-night-cycle"].active && game.user.isGM) {
         let dt = SimpleCalendar.api.timestampToDate(timestamp)
 
         let activesceneflags = game.scenes.active.data.flags["day-night-cycle"];
 
-        let sd = activesceneflags.sd
-        let mean = 0.5
+        let mean = 0.5;
+        let sd = activesceneflags.sd;
         let definition = activesceneflags.stepsize;
 
-        let secondsinday = SimpleCalendar.api.dateToTimestamp({year:0,month:0,day:1,hour:0,minute:0,seconds:0});
-        let secondsinhour = SimpleCalendar.api.dateToTimestamp({year:0,month:0,day:0,hour:1,minute:0,seconds:0});
-        let secondsinminute = SimpleCalendar.api.dateToTimestamp({year:0,month:0,day:0,hour:0,minute:1,seconds:0});
+        if (sd===undefined){sd = game.settings.get("day-night-cycle", "sd")}
+        if (definition===undefined){definition = game.settings.get("day-night-cycle", "stepsize")}
+
+
+        let secondsinday = SimpleCalendar.api.dateToTimestamp({year:0,month:0,day:1,hour:0,minute:0,second:0});
+        let secondsinhour = SimpleCalendar.api.dateToTimestamp({year:0,month:0,day:0,hour:1,minute:0,second:0});
+        let secondsinminute = SimpleCalendar.api.dateToTimestamp({year:0,month:0,day:0,hour:0,minute:1,second:0});
         let hoursinday = secondsinday/secondsinhour;
         let minutesinhour = secondsinhour/secondsinminute;
 
@@ -220,9 +266,12 @@ Hooks.on('updateWorldTime', async (timestamp,stepsize) => {
         }
 
         let dark = 1 - steppedS
+
+        console.log(update,s,visioncutoff,lastS,steppedS,dark)
         if (update) {
             Hooks.call("day-night-cycle-darknessupdated", dark);
-            game.scenes.active.scene.update({"darkness": dark}, {animateDarkness: 500})
+            canvas.drawings.get("sVWJPb21d4vjTDrF").update({text: "Darkness:"+steppedS.toString().substring(0, 5)});
+            game.scenes.active.update({"darkness": dark}, {animateDarkness: 500});
         }
     }
 })

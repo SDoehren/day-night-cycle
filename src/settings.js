@@ -22,7 +22,7 @@ export const registerSettings = function () {
         hint:"Smaller Numbers give longer nights",
         scope: "world",
         config: true,
-        default: 0.13,
+        default: 0.17,
         type: Number
     });
 

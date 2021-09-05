@@ -2,7 +2,7 @@
   "name": "day-night-cycle",
   "title": "Day Night Cycle",
   "description": "Day Night Cycle",
-  "version": "0001a",
+  "version": "0001",
   "author": "SDoehren",
   "esmodules": ["src/day-night-cycle.js"],
   "minimumCoreVersion": "0.8.9",

@@ -21,6 +21,9 @@
       {
         "name": "foundryvtt-simple-calendar",
         "manifest": "https://github.com/vigoren/foundryvtt-simple-calendar/releases/download/v1.3.28/module.json"
-      }
+      },
+    {
+      "name": "lib-wrapper"
+    }
     ]
 }

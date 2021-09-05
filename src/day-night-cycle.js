@@ -197,7 +197,7 @@ Hooks.once("canvasReady",async (canvas)=>{
 })
 
 
-
+ 
 
 Hooks.on('updateWorldTime', async (timestamp,stepsize) => {
     if (game.scenes.active.data.flags["day-night-cycle"].active && game.user.isGM) {

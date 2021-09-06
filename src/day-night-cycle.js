@@ -197,7 +197,7 @@ Hooks.once("canvasReady",async (canvas)=>{
 })
 
 
- 
+
 
 Hooks.on('updateWorldTime', async (timestamp,stepsize) => {
     if (game.scenes.active.data.flags["day-night-cycle"].active && game.user.isGM) {
@@ -270,7 +270,6 @@ Hooks.on('updateWorldTime', async (timestamp,stepsize) => {
         console.log(update,s,visioncutoff,lastS,steppedS,dark)
         if (update) {
             Hooks.call("day-night-cycle-darknessupdated", dark);
-            canvas.drawings.get("sVWJPb21d4vjTDrF").update({text: "Darkness:"+steppedS.toString().substring(0, 5)});
             game.scenes.active.update({"darkness": dark}, {animateDarkness: 500});
         }
     }

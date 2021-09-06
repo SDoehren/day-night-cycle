@@ -10,7 +10,6 @@
 
 [![ko-fi](https://img.shields.io/badge/ko--fi-Support%20Me-red?style=flat-square&logo=ko-fi)](https://ko-fi.com/sdoehren)
 [![Patreon](https://img.shields.io/badge/Patreon-Support%20Me-red?style=flat-square&logo=patreon)](https://www.patreon.com/bePatron?u=49614365)
-[![Patreon](https://img.shields.io/badge/Crypto-Support-red?style=flat-square)](https://sdoehren.github.io/support.html)
 
 
 [![The Forge](https://img.shields.io/badge/The%20Forge-Pay%20What%20You%20Want-success?style=flat-square)](https://eu.forge-vtt.com/bazaar#package=day-night-cycle)
@@ -23,7 +22,7 @@ Available on the Forge and via the module directory within Foundry.
 
 Alternatively install via the manifest url: https://github.com/SDoehren/day-night-cycle/releases/latest/download/module.json
 
-[Simple Calendar](https://github.com/vigoren/foundryvtt-simple-calendar) is the sole dependency for this module.
+[Simple Calendar](https://github.com/vigoren/foundryvtt-simple-calendar) and lib-wrapper are the dependencies for this module.
 
 ## Instructions
 

@@ -240,12 +240,12 @@ Hooks.on('updateWorldTime', async (timestamp,stepsize) => {
             steppedS = 0
         } else if (1 - s < definition) {
             steppedS = 1
-        } else if (Math.abs(s - lastS) < definition) {
-            update = false
-        } else if (lastS < visioncutoff && s >= visioncutoff) {
+        }  else if (lastS < visioncutoff && s >= visioncutoff) {
             steppedS = s
         } else if (lastS > visioncutoff && s <= visioncutoff) {
             steppedS = s
+        } else if (Math.abs(s - lastS) < definition) {
+            update = false
         } else {
             steppedS = Math.round(s / definition) * definition
             if (s - lastS > 0) {

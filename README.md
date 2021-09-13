@@ -16,13 +16,15 @@
 
 Day Night Cycle automatically changes the lighting levels to reflect the time of day based on the time in [Simple Calendar](https://github.com/vigoren/foundryvtt-simple-calendar).
 
+[Youtube Example](https://www.youtube.com/watch?v=3jIHKkcawq8)
+
 ## Install
 
 Available on the Forge and via the module directory within Foundry.
 
 Alternatively install via the manifest url: https://github.com/SDoehren/day-night-cycle/releases/latest/download/module.json
 
-[Simple Calendar](https://github.com/vigoren/foundryvtt-simple-calendar) and lib-wrapper are the dependencies for this module.
+[Simple Calendar](https://github.com/vigoren/foundryvtt-simple-calendar) and [lib-wrapper](https://github.com/ruipin/fvtt-lib-wrapper) are the dependencies for this module.
 
 ## Instructions
 
@@ -30,9 +32,12 @@ Default settings can be changed within the module settings.
 
 The activation and day night cycle can be controlled on a scene-by-scene basis within scene configure menu.
 
+The effects of changing the settings can be seen [here](https://sdoehren.com/daynightcycle)
+
 ## Planned changes
 
-- seasonal variation
+- Seasonal Variation
+- Lunar Light
 
 ## Change log
 

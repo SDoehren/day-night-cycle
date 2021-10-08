@@ -18,7 +18,7 @@ Day Night Cycle automatically changes the lighting levels to reflect the time of
 
 [Youtube Example](https://www.youtube.com/watch?v=3jIHKkcawq8)
 
-## Install
+## Install 
 
 Available on the Forge and via the module directory within Foundry.
 

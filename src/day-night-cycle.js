@@ -2,9 +2,6 @@ import {registerSettings} from './settings.js';
 
 'use strict';
 
-
-
-
 Hooks.once('init', async () => {
     console.log('day-night-cycle | Initializing tension-pool');
     registerSettings();

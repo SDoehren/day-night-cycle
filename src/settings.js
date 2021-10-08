@@ -34,4 +34,14 @@ export const registerSettings = function () {
         default: 0.005,
         type: Number
     });
+
+
+    game.settings.register("day-night-cycle", "Debug", {
+        name: "Turn on Debug",
+        hint:"You probably don't need this on.",
+        scope: "world",
+        config: true,
+        default: false,
+        type: Boolean
+    });
 };

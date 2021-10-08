@@ -1,7 +1,7 @@
 # Day Night Cycle
 
 [![GitHub release](https://img.shields.io/github/release/sdoehren/day-night-cycle.svg)](https://GitHub.com/sdoehren/day-night-cycle/releases/)
-[![GitHub issues](https://img.shields.io/github/issues/sdoehren/day-night-cycle.svg)](https://GitHub.com/sdoehren/day-night-cycle/issues/)
+[![GitHub issues](https://img.shields.io/github/issues/sdoehren/day-night-cycle/bug.svg)](https://GitHub.com/sdoehren/day-night-cycle/issues/)
 
 
 [![Forge Install %](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fday-night-cycle)](https://GitHub.com/sdoehren/day-night-cycle/releases/)

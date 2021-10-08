@@ -10,7 +10,11 @@ Hooks.once('init', async () => {
     registerSettings();
 });
 
-
+function DEBUG(message){
+    if (game.settings.get("day-night-cycle",'Debug')) {
+        console.log(message);
+    }
+}
 
 Hooks.on("ready", () => {
 
@@ -150,7 +154,7 @@ Hooks.once("init", () => {
             .val();
         configscene.setFlag("day-night-cycle", "stepsize", stepsize)
 
-        console.log(active,defaultval,sd,stepsize)
+        DEBUG(active,defaultval,sd,stepsize)
 
         return wrapped(...args);
     }, 'WRAPPER');
@@ -212,14 +216,10 @@ Hooks.on('updateWorldTime', async (timestamp,stepsize) => {
         if (sd===undefined){sd = game.settings.get("day-night-cycle", "sd")}
         if (definition===undefined){definition = game.settings.get("day-night-cycle", "stepsize")}
 
+        let hoursinday = SimpleCalendar.api.getTimeConfiguration().hoursInDay;
+        let minutesinhour = SimpleCalendar.api.getTimeConfiguration().minutesInHour;
 
-        let secondsinday = SimpleCalendar.api.dateToTimestamp({year:0,month:0,day:1,hour:0,minute:0,second:0});
-        let secondsinhour = SimpleCalendar.api.dateToTimestamp({year:0,month:0,day:0,hour:1,minute:0,second:0});
-        let secondsinminute = SimpleCalendar.api.dateToTimestamp({year:0,month:0,day:0,hour:0,minute:1,second:0});
-        let hoursinday = secondsinday/secondsinhour;
-        let minutesinhour = secondsinhour/secondsinminute;
-
-        console.log(hoursinday,minutesinhour)
+        DEBUG([hoursinday,minutesinhour])
 
         let lastS = 1 - game.scenes.active.data.darkness;
         let visioncutoff = 1 - game.scenes.active.data.globalLightThreshold;
@@ -267,7 +267,7 @@ Hooks.on('updateWorldTime', async (timestamp,stepsize) => {
 
         let dark = 1 - steppedS
 
-        console.log(update,s,visioncutoff,lastS,steppedS,dark)
+        DEBUG([update,s,visioncutoff,lastS,steppedS,dark])
         if (update) {
             Hooks.call("day-night-cycle-darknessupdated", dark);
             game.scenes.active.update({"darkness": dark}, {animateDarkness: 500});

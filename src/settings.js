@@ -35,6 +35,41 @@ export const registerSettings = function () {
         type: Number
     });
 
+    game.settings.register("day-night-cycle", "MaxLight", {
+        name: "What is the maximum light level? (Default)",
+        hint:"For worlds that do not reach full light.",
+        scope: "world",
+        config: true,
+        default: 1.0,
+        type: Number
+    });
+
+    game.settings.register("day-night-cycle", "moonon", {
+        name: "Moons effect lighting",
+        hint:"Should Moons effect the behaviour of Day Night Cycle by default?",
+        scope: "world",
+        config: true,
+        default: false,
+        type: Boolean
+    });
+
+    game.settings.register("day-night-cycle", "moonstrength", {
+        name: "Moon Strength (Default)",
+        hint:"The strength of light from each moon on a full moon at midnight.",
+        scope: "world",
+        config: true,
+        default: 0.1,
+        type: Number
+    });
+
+    game.settings.register("day-night-cycle", "currentmoonphases", {
+        name: "Current Moon Phase",
+        scope: "world",
+        config: false,
+        default: "{}",
+        type: String
+    });
+
 
     game.settings.register("day-night-cycle", "Debug", {
         name: "Turn on Debug",

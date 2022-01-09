@@ -33,6 +33,9 @@ Hooks.on("renderSceneConfig", (sheet, html, data) => {
     let defaultchecked;
     let sd;
     let stepsize;
+    let moonstrength;
+    let moononchecked;
+    let MaxLight;
 
     if (DNCflags===undefined){
         sheet.object.setFlag("day-night-cycle", "active", game.settings.get("day-night-cycle", "default-on"))
@@ -42,10 +45,19 @@ Hooks.on("renderSceneConfig", (sheet, html, data) => {
             activechecked = "";
         }
 
+        if (game.settings.get("day-night-cycle", "moonon")){
+            moononchecked = "checked";
+        } else {
+            moononchecked = "";
+        }
+
         defaultchecked = "checked";
 
         sd = game.settings.get("day-night-cycle", "sd");
         stepsize = game.settings.get("day-night-cycle", "stepsize");
+        moonstrength = game.settings.get("day-night-cycle", "moonstrength");
+        MaxLight = game.settings.get("day-night-cycle", "MaxLight");
+
 
 
     } else {
@@ -62,23 +74,35 @@ Hooks.on("renderSceneConfig", (sheet, html, data) => {
 
         let currentdefaultflag = DNCflags.default;
         defaultchecked = "";
+        let moononflag = DNCflags.moonon;
+        moononchecked = "";
 
         if (currentdefaultflag === true || currentdefaultflag === undefined) {
             defaultchecked = "checked";
+        }
+
+        if (moononflag === true || moononflag === undefined) {
+            moononchecked = "checked";
         }
 
 
         if (currentdefaultflag === true || currentdefaultflag === undefined) {
             sd = game.settings.get("day-night-cycle", "sd")
             stepsize = game.settings.get("day-night-cycle", "stepsize")
+            moonstrength = game.settings.get("day-night-cycle", "moonstrength")
+            MaxLight = game.settings.get("day-night-cycle", "MaxLight")
         } else {
             let currentsdflag = DNCflags.sd;
             if (currentsdflag === undefined) {
                 sd = game.settings.get("day-night-cycle", "sd")
                 stepsize = game.settings.get("day-night-cycle", "stepsize")
+                moonstrength = game.settings.get("day-night-cycle", "moonstrength")
+                MaxLight = game.settings.get("day-night-cycle", "MaxLight")
             } else {
                 sd = DNCflags.sd
                 stepsize = DNCflags.stepsize
+                moonstrength = DNCflags.moonstrength
+                MaxLight = DNCflags.MaxLight
             }
         }
     }
@@ -121,6 +145,30 @@ Hooks.on("renderSceneConfig", (sheet, html, data) => {
     </div>
     <p class="notes">Size of jumps when adjusting light levels - High number bigger jumps but less often.</p>
 </div>
+<div class="form-group">
+    <label>Moons effect lighting</label>
+    <div class="form-fields">
+        <label class="checkbox">
+            <input type="checkbox" id="DNC.moononflag" name="DNC.moononflag" ` + moononchecked + `>
+        </label>
+    </div>
+    <p class="notes">Turns on moon effects for this scene.</p>
+</div>
+
+<div class="form-group">
+    <label>Moon Brightness at Full Moon</label>
+    <div class="form-fields">
+        <input type="number" name="DNC.moonstrength" min="0.01" max="1.00" value="`+moonstrength+`" step="0.01" data-dtype="Number">
+    </div>
+</div>
+
+<div class="form-group">
+    <label>Max Brightness for Scene</label>
+    <div class="form-fields">
+        <input type="number" name="DNC.MaxLight" min="0.01" max="1.00" value="`+MaxLight+`" step="0.01" data-dtype="Number">
+    </div>
+    <p class="notes">For worlds that do not reach full light.</p>
+</div>
 `);
 
 })
@@ -130,6 +178,11 @@ Hooks.once("init", () => {
     libWrapper.register("day-night-cycle", "SceneConfig.prototype._getSubmitData", function (wrapped, ...args) {
         let event = this.form;
         let configscene = this.object;
+
+        const moonon = $(event)
+            .find('input[name="DNC.moononflag"]')
+            .prop("checked");
+        configscene.setFlag("day-night-cycle", "moonon", moonon)
 
         const active = $(event)
             .find('input[name="DNC.active"]')
@@ -151,6 +204,16 @@ Hooks.once("init", () => {
             .val();
         configscene.setFlag("day-night-cycle", "stepsize", stepsize)
 
+        const moonstrength = $(event)
+            .find('input[name="DNC.moonstrength"]')
+            .val();
+        configscene.setFlag("day-night-cycle", "moonstrength", moonstrength)
+
+        const MaxLight = $(event)
+            .find('input[name="DNC.MaxLight"]')
+            .val();
+        configscene.setFlag("day-night-cycle", "MaxLight", MaxLight)
+
         DEBUG(active,defaultval,sd,stepsize)
 
         return wrapped(...args);
@@ -168,13 +231,18 @@ Hooks.once("canvasReady",async (canvas)=>{
         canvas.scene.setFlag("day-night-cycle", "sd", game.settings.get("day-night-cycle", "sd"))
         canvas.scene.setFlag("day-night-cycle", "stepsize", game.settings.get("day-night-cycle", "stepsize"))
         canvas.scene.setFlag("day-night-cycle", "default", true)
+        canvas.scene.setFlag("day-night-cycle", "moonon", game.settings.get("day-night-cycle", "moonon"))
+        canvas.scene.setFlag("day-night-cycle", "moonstrength", game.settings.get("day-night-cycle", "moonstrength"))
+        canvas.scene.setFlag("day-night-cycle", "MaxLight", game.settings.get("day-night-cycle", "MaxLight"))
         return;
     }
 
     let currentactiveflag = DNCflags.active;
-    let sd = DNCflags.active;
-    let stepsize= DNCflags.active;
+    let sd = DNCflags.sd;
+    let stepsize= DNCflags.stepsize;
     let defaultmode= DNCflags.default;
+    let moonon= DNCflags.moonon;
+    let moonstrength= DNCflags.moonstrength;
 
     if (currentactiveflag === undefined){
         console.log('day-night-cycle | setting active flag');
@@ -194,6 +262,21 @@ Hooks.once("canvasReady",async (canvas)=>{
     if (defaultmode === undefined){
         console.log('day-night-cycle | setting default flag');
         canvas.scene.setFlag("day-night-cycle", "default", true)
+    }
+
+    if (moonon === undefined){
+        console.log('day-night-cycle | setting moonon flag');
+        canvas.scene.setFlag("day-night-cycle", "moonon", game.settings.get("day-night-cycle", "moonon"))
+    }
+
+    if (moonstrength === undefined){
+        console.log('day-night-cycle | setting moonstrength flag');
+        canvas.scene.setFlag("day-night-cycle", "moonstrength", game.settings.get("day-night-cycle", "moonstrength"))
+    }
+
+    if (moonstrength === undefined){
+        console.log('day-night-cycle | setting MaxLight flag');
+        canvas.scene.setFlag("day-night-cycle", "MaxLight", game.settings.get("day-night-cycle", "MaxLight"))
     }
 })
 
@@ -229,7 +312,22 @@ Hooks.on('updateWorldTime', async (timestamp,stepsize) => {
         const maxscore = (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * (((0.5 - mean) / sd) ** 2))
         const divisor = maxscore - minscore
 
+
+
+        let MaxLight = activesceneflags.MaxLight
+        if (MaxLight===undefined){MaxLight = game.settings.get("day-night-cycle", "MaxLight")}
+
         let s = ((score(sd, mean, (dt.hour * minutesinhour + dt.minute) / (hoursinday * minutesinhour)) - minscore) / divisor);
+        s = s*MaxLight
+
+        let Moonvalues;
+        if (((dt.hour * minutesinhour + dt.minute) / (hoursinday * minutesinhour)) - minscore > 0.5){
+            Moonvalues = SimpleCalendar.api.getAllMoons().map(x=>x.currentPhase.name)
+            game.settings.set("day-night-cycle", "currentmoonphases", JSON.stringify(Moonvalues))
+        } else {
+            Moonvalues = JSON.parse(game.settings.get("day-night-cycle", "currentmoonphases"));
+        }
+
 
         let steppedS;
         let update = true;
@@ -264,7 +362,28 @@ Hooks.on('updateWorldTime', async (timestamp,stepsize) => {
 
         let dark = 1 - steppedS
 
-        DEBUG([update,s,visioncutoff,lastS,steppedS,dark])
+        let MoonStages = {
+            "New Moon":0.0,
+            "Waxing Crescent":0.25,
+            "First Quarter":0.50,
+            "Waxing Gibbous":0.75,
+            "Full Moon":1.0,
+            "Waning Gibbous":0.75,
+            "Last Quarter":0.50,
+            "Waning Crescent":0.25,
+        }
+
+        Moonvalues= Moonvalues.map(x=>MoonStages[x])
+        let moonmax = activesceneflags.moonstrength
+        if (moonmax===undefined){moonmax = game.settings.get("day-night-cycle", "moonstrength")}
+        let combinedbrightness = Moonvalues.reduce((a, b) => a + b, 0)
+        let finalmoonbrightness = combinedbrightness*(dark*moonmax)
+        DEBUG([Moonvalues,moonmax,dark,combinedbrightness,finalmoonbrightness])
+        dark = dark-finalmoonbrightness
+
+        if (dark<0){dark=0}
+
+        DEBUG("update:"+update+"| s:"+s+"| visioncutoff:"+visioncutoff+"| lastS:"+lastS+"| steppedS:"+steppedS+"| dark:"+dark)
         if (update) {
             Hooks.call("day-night-cycle-darknessupdated", dark);
             game.scenes.active.update({"darkness": dark}, {animateDarkness: 500});

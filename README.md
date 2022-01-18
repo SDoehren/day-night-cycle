@@ -9,14 +9,19 @@
 [![Github Releases (by Release)](https://img.shields.io/github/downloads/sdoehren/day-night-cycle/latest/total.svg)](https://GitHub.com/sdoehren/day-night-cycle/releases/)
 
 [![ko-fi](https://img.shields.io/badge/ko--fi-Support%20Me-red?style=flat-square&logo=ko-fi)](https://ko-fi.com/sdoehren)
-[![Patreon](https://img.shields.io/badge/Patreon-Support%20Me-red?style=flat-square&logo=patreon)](https://www.patreon.com/bePatron?u=49614365)
-
 
 [![The Forge](https://img.shields.io/badge/The%20Forge-Pay%20What%20You%20Want-success?style=flat-square)](https://eu.forge-vtt.com/bazaar#package=day-night-cycle)
 
 Day Night Cycle automatically changes the lighting levels to reflect the time of day based on the time in [Simple Calendar](https://github.com/vigoren/foundryvtt-simple-calendar).
 
 [Youtube Example](https://www.youtube.com/watch?v=3jIHKkcawq8)
+
+## Future of Day Night Cycle
+
+Going forwards Day Night Cycle should be seen as unsupported.
+
+To be open, in the year since the release of my first module, across all of my modules, I have generated income that is less than 10 hours of my real job.  
+As a result I will continue to develop Day Night Cycle for my own games and will release updates as and when but to reiterate Day Night Cycle should be seen as unsupported going forwards.
 
 ## Install 
 

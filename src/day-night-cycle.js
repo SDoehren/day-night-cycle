@@ -16,12 +16,27 @@ function DEBUG(message){
 Hooks.on("ready", () => {
 
     if (game.settings.get("day-night-cycle", "first-load") && game.user.isGM){
-        let message = "Hi,<br>Thanks for installing Day Night Cycle<br>I recommend you goto<br>https://sdoehren.com/daynightcycle<br>" +
-            "before you make any changes to the default settings.<br>This message will not be shown again.<br>" +
+        let message = "Hi,<br>Thanks for installing Day Night Cycle<br>" +
+            "I recommend you goto<br>" +
+            "https://sdoehren.com/daynightcycle<br>" +
+            "before you make any changes to the default settings.<br>" +
+            "This message will not be shown again.<br><br>" +
             "All the best,<br>SDoehren<br>Discord Server: https://discord.gg/QNQZwGGxuN"
         ChatMessage.create({whisper:ChatMessage.getWhisperRecipients("GM"),content: message,speaker:ChatMessage.getSpeaker({alias: "Day Night Cycle"})}, {});
         game.settings.set("day-night-cycle", "first-load",false)
     }
+
+    let CURRENTMESSAGE = 1;
+    if (game.settings.get("day-night-cycle", "message-number")<CURRENTMESSAGE && game.user.isGM){
+        let message = "Hi,<br>Thanks for updating Day Night Cycle<br>" +
+            "Please note that the Moon Effects are only available when the game language is set to English; a fix is being investigated.<br><br>" +
+            "This message will not be shown again.<br><br>" +
+            "All the best,<br>SDoehren<br>Discord Server: https://discord.gg/QNQZwGGxuN"
+        ChatMessage.create({whisper:ChatMessage.getWhisperRecipients("GM"),content: message,speaker:ChatMessage.getSpeaker({alias: "Day Night Cycle"})}, {});
+        game.settings.set("day-night-cycle", "message-number",CURRENTMESSAGE)
+    }
+
+
     console.log('day-night-cycle | Ready');
 });
 
@@ -319,6 +334,7 @@ Hooks.on('updateWorldTime', async (timestamp,stepsize) => {
 
         let s = ((score(sd, mean, (dt.hour * minutesinhour + dt.minute) / (hoursinday * minutesinhour)) - minscore) / divisor);
         s = s*MaxLight
+        DEBUG(["score",s])
 
         let Moonvalues;
         if (((dt.hour * minutesinhour + dt.minute) / (hoursinday * minutesinhour)) - minscore > 0.5){
@@ -327,40 +343,51 @@ Hooks.on('updateWorldTime', async (timestamp,stepsize) => {
         } else {
             Moonvalues = JSON.parse(game.settings.get("day-night-cycle", "currentmoonphases"));
         }
-
+        DEBUG(["Moonvalues",Moonvalues])
 
         let steppedS;
         let update = true;
+        let steppedStype;
         if (s < definition) {
             steppedS = 0
+            steppedStype=1
         } else if (1 - s < definition) {
             steppedS = 1
+            steppedStype=2
         }  else if (lastS < visioncutoff && s >= visioncutoff) {
             steppedS = s
+            steppedStype=3
         } else if (lastS > visioncutoff && s <= visioncutoff) {
             steppedS = s
+            steppedStype=4
         } else if (Math.abs(s - lastS) < definition) {
             update = false
+            steppedStype=5
         } else {
             steppedS = Math.round(s / definition) * definition
+            steppedStype=6
             if (s - lastS > 0) {
                 steppedS += definition / 2
             } else {
                 steppedS -= definition / 2
             }
         }
+        DEBUG(["steppedS",steppedS])
 
         if (steppedS > visioncutoff && s <= visioncutoff) {
             steppedS = parseFloat(visioncutoff) - 0.001
         } else if (steppedS < visioncutoff && s >= visioncutoff) {
             steppedS = parseFloat(visioncutoff) + 0.001
         }
+        DEBUG(["parseFloat steppedS",steppedS])
 
         if (Math.abs(steppedS - lastS) === 0) {
             update = false
         }
+        DEBUG(["Math.abs steppedS",steppedS])
 
         let dark = 1 - steppedS
+        DEBUG(["dark 1 ",dark])
 
         let MoonStages = {
             "New Moon":0.0,
@@ -378,10 +405,16 @@ Hooks.on('updateWorldTime', async (timestamp,stepsize) => {
         if (moonmax===undefined){moonmax = game.settings.get("day-night-cycle", "moonstrength")}
         let combinedbrightness = Moonvalues.reduce((a, b) => a + b, 0)
         let finalmoonbrightness = combinedbrightness*(dark*moonmax)
-        DEBUG([Moonvalues,moonmax,dark,combinedbrightness,finalmoonbrightness])
-        dark = dark-finalmoonbrightness
+        DEBUG(["Moonvalues Final",Moonvalues,moonmax,dark,combinedbrightness,finalmoonbrightness])
+        if (!isNaN(finalmoonbrightness)) {
+            dark = dark - finalmoonbrightness
+        }
+        DEBUG(["dark 2",dark])
 
         if (dark<0){dark=0}
+        if (dark>1){dark=1}
+
+        DEBUG(["dark final",dark])
 
         DEBUG("update:"+update+"| s:"+s+"| visioncutoff:"+visioncutoff+"| lastS:"+lastS+"| steppedS:"+steppedS+"| dark:"+dark)
         if (update) {

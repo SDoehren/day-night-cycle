@@ -8,6 +8,13 @@ export const registerSettings = function () {
         type: Boolean
     });
 
+    game.settings.register("day-night-cycle", "message-number", {
+        scope: "world",
+        config: false,
+        default: 0,
+        type: Number
+    });
+
     game.settings.register("day-night-cycle", "default-on", {
         name: "Default to On",
         hint:"Should Day Night Cycle activate on scenes by default?",

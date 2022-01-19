@@ -1,5 +1,10 @@
 # Change Log
 
+#### 0005 - Bug Fix
+
+- NaN Bug Fixed
+- Moon Lighting Cycles unavailable in languages other than English (under investigation)
+
 #### 0004 - V9 Compatibility Version
 
 - V9 Compatibility

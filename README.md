@@ -20,8 +20,9 @@ Day Night Cycle automatically changes the lighting levels to reflect the time of
 
 Going forwards Day Night Cycle should be seen as unsupported.
 
-To be open, in the year since the release of my first module, across all of my modules, I have generated income that is less than 10 hours of my real job.  
 As a result I will continue to develop Day Night Cycle for my own games and will release updates as and when but to reiterate Day Night Cycle should be seen as unsupported going forwards.
+
+V10 support is not planned
 
 ## Install 
 

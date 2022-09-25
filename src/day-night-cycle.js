@@ -40,6 +40,7 @@ Hooks.on("ready", () => {
     console.log('day-night-cycle | Ready');
 });
 
+
 Hooks.on("renderSceneConfig", (sheet, html, data) => {
 
     let DNCflags = sheet.object.data.flags["day-night-cycle"]
@@ -294,8 +295,6 @@ Hooks.once("canvasReady",async (canvas)=>{
         canvas.scene.setFlag("day-night-cycle", "MaxLight", game.settings.get("day-night-cycle", "MaxLight"))
     }
 })
-
-
 
 
 Hooks.on('updateWorldTime', async (timestamp,stepsize) => {

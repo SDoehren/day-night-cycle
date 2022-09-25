@@ -22,7 +22,7 @@ Going forwards Day Night Cycle should be seen as unsupported.
 
 As a result I will continue to develop Day Night Cycle for my own games and will release updates as and when but to reiterate Day Night Cycle should be seen as unsupported going forwards.
 
-V10 support is not planned
+V10 support is planned but could be 2023.
 
 ## Install 
 

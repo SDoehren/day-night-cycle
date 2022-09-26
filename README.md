@@ -43,7 +43,6 @@ The effects of changing the settings can be seen [here](https://sdoehren.com/day
 ## Planned changes
 
 - Seasonal Variation
-- Lunar Light
 
 ## Change log
 

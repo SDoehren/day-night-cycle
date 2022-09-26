@@ -1,5 +1,10 @@
 # Change Log
 
+#### 0006 - V10 Compatibility
+
+- Lighting now updated on active scene and any scene being viewed by any player.
+- V10 Compatibility
+
 #### 0005 - Bug Fix
 
 - NaN Bug Fixed

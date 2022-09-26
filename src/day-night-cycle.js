@@ -239,8 +239,15 @@ Hooks.once("init", () => {
 
 
 Hooks.once("canvasReady",async (canvas)=>{
+    let scenedataobj;
+    if (game.version>10){
+        scenedataobj = canvas.scene
+    } else {
+        scenedataobj = canvas.scene.data
+    }
 
-    let DNCflags = canvas.scene.data.flags["day-night-cycle"]
+
+    let DNCflags = scenedataobj.flags["day-night-cycle"]
     if (DNCflags === undefined){
         console.log('day-night-cycle | setting flags');
         canvas.scene.setFlag("day-night-cycle", "active", game.settings.get("day-night-cycle", "default-on"))
@@ -296,11 +303,18 @@ Hooks.once("canvasReady",async (canvas)=>{
     }
 })
 
-function updatelighting(sceneid){
+function updatelighting(sceneid,timestamp){
     let sceneobj = game.scenes.get(sceneid);
-    if (!sceneobj.data.flags["day-night-cycle"].active){return;}
+    let scenedataobj;
+    if (game.version>10){
+        scenedataobj = sceneobj
+    } else {
+        scenedataobj = sceneobj.data
+    }
 
-    let sceneflags = sceneobj.data.flags["day-night-cycle"];
+    if (!scenedataobj.flags["day-night-cycle"].active){return;}
+
+    let sceneflags = scenedataobj.flags["day-night-cycle"];
 
     let mean = 0.5;
     let sd = sceneflags.sd;
@@ -312,8 +326,8 @@ function updatelighting(sceneid){
     let hoursinday = SimpleCalendar.api.getTimeConfiguration().hoursInDay;
     let minutesinhour = SimpleCalendar.api.getTimeConfiguration().minutesInHour;
 
-    let lastS = 1 - sceneobj.data.darkness;
-    let visioncutoff = 1 - sceneobj.data.globalLightThreshold;
+    let lastS = 1 - scenedataobj.darkness;
+    let visioncutoff = 1 - scenedataobj.globalLightThreshold;
 
     function score(sd, mean, X) {
         return (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * (((X - mean) / sd) ** 2))
@@ -326,6 +340,7 @@ function updatelighting(sceneid){
     let MaxLight = sceneflags.MaxLight
     if (MaxLight===undefined){MaxLight = game.settings.get("day-night-cycle", "MaxLight")}
 
+    let dt = SimpleCalendar.api.timestampToDate(timestamp)
     let s = ((score(sd, mean, (dt.hour * minutesinhour + dt.minute) / (hoursinday * minutesinhour)) - minscore) / divisor);
     s = s*MaxLight
 
@@ -336,6 +351,12 @@ function updatelighting(sceneid){
     } else {
         Moonvalues = JSON.parse(game.settings.get("day-night-cycle", "currentmoonphases"));
     }
+
+    if (Object.keys(Moonvalues).length === 0){
+        Moonvalues = SimpleCalendar.api.getAllMoons().map(x=>x.currentPhase.name)
+        game.settings.set("day-night-cycle", "currentmoonphases", JSON.stringify(Moonvalues))
+    }
+
 
     let steppedS;
     let update = true;
@@ -375,7 +396,7 @@ function updatelighting(sceneid){
         "Full Moon":1.0, "Waning Gibbous":0.75, "Last Quarter":0.50, "Waning Crescent":0.25}
 
     Moonvalues= Moonvalues.map(x=>MoonStages[x])
-    let moonmax = activesceneflags.moonstrength
+    let moonmax = sceneflags.moonstrength
     if (moonmax===undefined){moonmax = game.settings.get("day-night-cycle", "moonstrength")}
     let combinedbrightness = Moonvalues.reduce((a, b) => a + b, 0)
     let finalmoonbrightness = combinedbrightness*(dark*moonmax)
@@ -395,17 +416,14 @@ function updatelighting(sceneid){
 }
 
 Hooks.on('updateWorldTime', async (timestamp,stepsize) => {
-    if (game.scenes.active.data.flags["day-night-cycle"].active && game.user.isGM) {
+    if (stepsize>0 && game.user.isGM) {
         let currentlyviewedscenes = game.users.filter(x => x.viewedScene !== null).map(x => x.viewedScene);
         currentlyviewedscenes.push(game.scenes.active.id)
         currentlyviewedscenes = [...new Set(currentlyviewedscenes)]
         currentlyviewedscenes
 
         for (let i = 0; i < currentlyviewedscenes.length; i++) {
-          updatelighting(currentlyviewedscenes[i])
+          updatelighting(currentlyviewedscenes[i],timestamp)
         }
-
-
-
     }
 })

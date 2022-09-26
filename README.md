@@ -18,11 +18,11 @@ Day Night Cycle automatically changes the lighting levels to reflect the time of
 
 ## Future of Day Night Cycle
 
+Day Night Cycle has been updated to V10.
+
 Going forwards Day Night Cycle should be seen as unsupported.
 
-I will continue to develop Day Night Cycle for my own games and will release updates as and when.
-
-But to reiterate Day Night Cycle should be seen as unsupported going forwards.
+I will continue to develop Day Night Cycle for my own games but releases as and when.
 
 ## Install 
 

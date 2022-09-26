@@ -296,129 +296,116 @@ Hooks.once("canvasReady",async (canvas)=>{
     }
 })
 
+function updatelighting(sceneid){
+    let sceneobj = game.scenes.get(sceneid);
+    if (!sceneobj.data.flags["day-night-cycle"].active){return;}
+
+    let sceneflags = sceneobj.data.flags["day-night-cycle"];
+
+    let mean = 0.5;
+    let sd = sceneflags.sd;
+    let definition = sceneflags.stepsize;
+
+    if (sd===undefined){sd = game.settings.get("day-night-cycle", "sd")}
+    if (definition===undefined){definition = game.settings.get("day-night-cycle", "stepsize")}
+
+    let hoursinday = SimpleCalendar.api.getTimeConfiguration().hoursInDay;
+    let minutesinhour = SimpleCalendar.api.getTimeConfiguration().minutesInHour;
+
+    let lastS = 1 - sceneobj.data.darkness;
+    let visioncutoff = 1 - sceneobj.data.globalLightThreshold;
+
+    function score(sd, mean, X) {
+        return (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * (((X - mean) / sd) ** 2))
+    }
+
+    const minscore = (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * (((0 - mean) / sd) ** 2))
+    const maxscore = (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * (((0.5 - mean) / sd) ** 2))
+    const divisor = maxscore - minscore
+
+    let MaxLight = sceneflags.MaxLight
+    if (MaxLight===undefined){MaxLight = game.settings.get("day-night-cycle", "MaxLight")}
+
+    let s = ((score(sd, mean, (dt.hour * minutesinhour + dt.minute) / (hoursinday * minutesinhour)) - minscore) / divisor);
+    s = s*MaxLight
+
+    let Moonvalues;
+    if (((dt.hour * minutesinhour + dt.minute) / (hoursinday * minutesinhour)) - minscore > 0.5){
+        Moonvalues = SimpleCalendar.api.getAllMoons().map(x=>x.currentPhase.name)
+        game.settings.set("day-night-cycle", "currentmoonphases", JSON.stringify(Moonvalues))
+    } else {
+        Moonvalues = JSON.parse(game.settings.get("day-night-cycle", "currentmoonphases"));
+    }
+
+    let steppedS;
+    let update = true;
+    if (s < definition) {
+        steppedS = 0
+    } else if (1 - s < definition) {
+        steppedS = 1
+    }  else if (lastS < visioncutoff && s >= visioncutoff) {
+        steppedS = s
+    } else if (lastS > visioncutoff && s <= visioncutoff) {
+        steppedS = s
+    } else if (Math.abs(s - lastS) < definition) {
+        update = false
+    } else {
+        steppedS = Math.round(s / definition) * definition
+        if (s - lastS > 0) {
+            steppedS += definition / 2
+        } else {
+            steppedS -= definition / 2
+        }
+    }
+
+    if (steppedS > visioncutoff && s <= visioncutoff) {
+        steppedS = parseFloat(visioncutoff) - 0.001
+    } else if (steppedS < visioncutoff && s >= visioncutoff) {
+        steppedS = parseFloat(visioncutoff) + 0.001
+    }
+
+    if (Math.abs(steppedS - lastS) === 0) {
+        update = false
+    }
+
+    let dark = 1 - steppedS
+    DEBUG(["dark 1 ",dark])
+
+    let MoonStages = {"New Moon":0.0, "Waxing Crescent":0.25, "First Quarter":0.50, "Waxing Gibbous":0.75,
+        "Full Moon":1.0, "Waning Gibbous":0.75, "Last Quarter":0.50, "Waning Crescent":0.25}
+
+    Moonvalues= Moonvalues.map(x=>MoonStages[x])
+    let moonmax = activesceneflags.moonstrength
+    if (moonmax===undefined){moonmax = game.settings.get("day-night-cycle", "moonstrength")}
+    let combinedbrightness = Moonvalues.reduce((a, b) => a + b, 0)
+    let finalmoonbrightness = combinedbrightness*(dark*moonmax)
+
+    if (!isNaN(finalmoonbrightness)) {
+        dark = dark - finalmoonbrightness
+    }
+
+    if (dark<0){dark=0}
+    if (dark>1){dark=1}
+
+    if (update) {
+        Hooks.call("day-night-cycle-darknessupdated", [sceneid,dark]);
+        sceneobj.update({"darkness": dark}, {animateDarkness: 500});
+    }
+
+}
 
 Hooks.on('updateWorldTime', async (timestamp,stepsize) => {
     if (game.scenes.active.data.flags["day-night-cycle"].active && game.user.isGM) {
-        let dt = SimpleCalendar.api.timestampToDate(timestamp)
+        let currentlyviewedscenes = game.users.filter(x => x.viewedScene !== null).map(x => x.viewedScene);
+        currentlyviewedscenes.push(game.scenes.active.id)
+        currentlyviewedscenes = [...new Set(currentlyviewedscenes)]
+        currentlyviewedscenes
 
-        let activesceneflags = game.scenes.active.data.flags["day-night-cycle"];
-
-        let mean = 0.5;
-        let sd = activesceneflags.sd;
-        let definition = activesceneflags.stepsize;
-
-        if (sd===undefined){sd = game.settings.get("day-night-cycle", "sd")}
-        if (definition===undefined){definition = game.settings.get("day-night-cycle", "stepsize")}
-
-        let hoursinday = SimpleCalendar.api.getTimeConfiguration().hoursInDay;
-        let minutesinhour = SimpleCalendar.api.getTimeConfiguration().minutesInHour;
-
-        DEBUG([hoursinday,minutesinhour])
-
-        let lastS = 1 - game.scenes.active.data.darkness;
-        let visioncutoff = 1 - game.scenes.active.data.globalLightThreshold;
-
-        function score(sd, mean, X) {
-            return (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * (((X - mean) / sd) ** 2))
+        for (let i = 0; i < currentlyviewedscenes.length; i++) {
+          updatelighting(currentlyviewedscenes[i])
         }
 
-        const minscore = (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * (((0 - mean) / sd) ** 2))
-        const maxscore = (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * (((0.5 - mean) / sd) ** 2))
-        const divisor = maxscore - minscore
 
 
-
-        let MaxLight = activesceneflags.MaxLight
-        if (MaxLight===undefined){MaxLight = game.settings.get("day-night-cycle", "MaxLight")}
-
-        let s = ((score(sd, mean, (dt.hour * minutesinhour + dt.minute) / (hoursinday * minutesinhour)) - minscore) / divisor);
-        s = s*MaxLight
-        DEBUG(["score",s])
-
-        let Moonvalues;
-        if (((dt.hour * minutesinhour + dt.minute) / (hoursinday * minutesinhour)) - minscore > 0.5){
-            Moonvalues = SimpleCalendar.api.getAllMoons().map(x=>x.currentPhase.name)
-            game.settings.set("day-night-cycle", "currentmoonphases", JSON.stringify(Moonvalues))
-        } else {
-            Moonvalues = JSON.parse(game.settings.get("day-night-cycle", "currentmoonphases"));
-        }
-        DEBUG(["Moonvalues",Moonvalues])
-
-        let steppedS;
-        let update = true;
-        let steppedStype;
-        if (s < definition) {
-            steppedS = 0
-            steppedStype=1
-        } else if (1 - s < definition) {
-            steppedS = 1
-            steppedStype=2
-        }  else if (lastS < visioncutoff && s >= visioncutoff) {
-            steppedS = s
-            steppedStype=3
-        } else if (lastS > visioncutoff && s <= visioncutoff) {
-            steppedS = s
-            steppedStype=4
-        } else if (Math.abs(s - lastS) < definition) {
-            update = false
-            steppedStype=5
-        } else {
-            steppedS = Math.round(s / definition) * definition
-            steppedStype=6
-            if (s - lastS > 0) {
-                steppedS += definition / 2
-            } else {
-                steppedS -= definition / 2
-            }
-        }
-        DEBUG(["steppedS",steppedS])
-
-        if (steppedS > visioncutoff && s <= visioncutoff) {
-            steppedS = parseFloat(visioncutoff) - 0.001
-        } else if (steppedS < visioncutoff && s >= visioncutoff) {
-            steppedS = parseFloat(visioncutoff) + 0.001
-        }
-        DEBUG(["parseFloat steppedS",steppedS])
-
-        if (Math.abs(steppedS - lastS) === 0) {
-            update = false
-        }
-        DEBUG(["Math.abs steppedS",steppedS])
-
-        let dark = 1 - steppedS
-        DEBUG(["dark 1 ",dark])
-
-        let MoonStages = {
-            "New Moon":0.0,
-            "Waxing Crescent":0.25,
-            "First Quarter":0.50,
-            "Waxing Gibbous":0.75,
-            "Full Moon":1.0,
-            "Waning Gibbous":0.75,
-            "Last Quarter":0.50,
-            "Waning Crescent":0.25,
-        }
-
-        Moonvalues= Moonvalues.map(x=>MoonStages[x])
-        let moonmax = activesceneflags.moonstrength
-        if (moonmax===undefined){moonmax = game.settings.get("day-night-cycle", "moonstrength")}
-        let combinedbrightness = Moonvalues.reduce((a, b) => a + b, 0)
-        let finalmoonbrightness = combinedbrightness*(dark*moonmax)
-        DEBUG(["Moonvalues Final",Moonvalues,moonmax,dark,combinedbrightness,finalmoonbrightness])
-        if (!isNaN(finalmoonbrightness)) {
-            dark = dark - finalmoonbrightness
-        }
-        DEBUG(["dark 2",dark])
-
-        if (dark<0){dark=0}
-        if (dark>1){dark=1}
-
-        DEBUG(["dark final",dark])
-
-        DEBUG("update:"+update+"| s:"+s+"| visioncutoff:"+visioncutoff+"| lastS:"+lastS+"| steppedS:"+steppedS+"| dark:"+dark)
-        if (update) {
-            Hooks.call("day-night-cycle-darknessupdated", dark);
-            game.scenes.active.update({"darkness": dark}, {animateDarkness: 500});
-        }
     }
 })

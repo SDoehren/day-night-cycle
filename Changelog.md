@@ -1,5 +1,9 @@
 # Change Log
 
+#### 0007 - V11 Compatibility
+
+- V11 Compatibility
+
 #### 0006 - V10 Compatibility
 
 - Lighting now updated on active scene and any scene being viewed by any player.

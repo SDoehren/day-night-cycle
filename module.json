@@ -2,17 +2,18 @@
   "name": "day-night-cycle",
   "title": "Day Night Cycle",
   "description": "Day Night Cycle automatically changes the lighting levels to reflect the time of day based on the time in Simple Calendar.",
-  "version": "0006",
+  "version": "0007",
   "authors": [{"name": "SDoehren"}],
   "esmodules": ["src/day-night-cycle.js"],
   "compatibility": {
-    "minimum": "9",
-    "verified": "10",
-    "maximum": "10"
+    "minimum": "11",
+    "verified": "11",
+    "maximum": "11"
   },
+  "minimumCoreVersion": "11",
   "url": "https://github.com/SDoehren/day-night-cycle",
   "manifest": "https://github.com/SDoehren/day-night-cycle/releases/latest/download/module.json",
-  "download": "https://github.com/SDoehren/day-night-cycle/releases/latest/download/day-night-cycle0006.zip",
+  "download": "https://github.com/SDoehren/day-night-cycle/releases/latest/download/module.zip",
   "license": "CC-BY-NC-SA-4.0",
   "readme": "https://raw.githubusercontent.com/SDoehren/day-night-cycle/main/README.md",
   "socket": true,

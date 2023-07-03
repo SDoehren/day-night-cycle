@@ -312,9 +312,12 @@ function updatelighting(sceneid,timestamp){
         scenedataobj = sceneobj.data
     }
 
+    DEBUG("DNC Active",scenedataobj.flags["day-night-cycle"].active)
     if (!scenedataobj.flags["day-night-cycle"].active){return;}
 
     let sceneflags = scenedataobj.flags["day-night-cycle"];
+
+    DEBUG("DNC Scene Flags",sceneflags)
 
     let mean = 0.5;
     let sd = sceneflags.sd;
@@ -390,7 +393,7 @@ function updatelighting(sceneid,timestamp){
     }
 
     let dark = 1 - steppedS
-    DEBUG(["dark 1 ",dark])
+    DEBUG(["Darkness Level: ",dark])
 
     let MoonStages = {"New Moon":0.0, "Waxing Crescent":0.25, "First Quarter":0.50, "Waxing Gibbous":0.75,
         "Full Moon":1.0, "Waning Gibbous":0.75, "Last Quarter":0.50, "Waning Crescent":0.25}
@@ -409,21 +412,24 @@ function updatelighting(sceneid,timestamp){
     if (dark>1){dark=1}
 
     if (update) {
+        DEBUG("Updated Scene Lighting ",true)
         Hooks.call("day-night-cycle-darknessupdated", [sceneid,dark]);
         sceneobj.update({"darkness": dark}, {animateDarkness: 500});
+    } else {
+        DEBUG("Updated Scene Lighting ",false)
     }
-
 }
 
 Hooks.on('updateWorldTime', async (timestamp,stepsize) => {
-    if (stepsize>0 && game.user.isGM) {
+    if (stepsize > 0 && game.user.isGM) {
         let currentlyviewedscenes = game.users.filter(x => x.viewedScene !== null).map(x => x.viewedScene);
         currentlyviewedscenes.push(game.scenes.active.id)
         currentlyviewedscenes = [...new Set(currentlyviewedscenes)]
         currentlyviewedscenes
 
         for (let i = 0; i < currentlyviewedscenes.length; i++) {
-          updatelighting(currentlyviewedscenes[i],timestamp)
+            DEBUG("Updating Lighting on Scene:", currentlyviewedscenes[i])
+            updatelighting(currentlyviewedscenes[i], timestamp)
         }
     }
 })

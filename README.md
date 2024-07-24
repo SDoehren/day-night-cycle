@@ -18,7 +18,7 @@ Day Night Cycle automatically changes the lighting levels to reflect the time of
 
 ## Future of Day Night Cycle
 
-Day Night Cycle has been updated to V10.
+Day Night Cycle has been updated to V12.
 
 Going forwards Day Night Cycle should be treated as unsupported.
 

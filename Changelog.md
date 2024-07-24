@@ -1,5 +1,9 @@
 # Change Log
 
+#### 0008 - V12 Compatibility
+
+- V12 Compatibility
+
 #### 0007 - V11 Compatibility
 
 - V11 Compatibility

@@ -29,7 +29,7 @@ Hooks.on("ready", () => {
     let CURRENTMESSAGE = 1;
     if (game.settings.get("day-night-cycle", "message-number")<CURRENTMESSAGE && game.user.isGM){
         let message = "Hi,<br>Thanks for updating Day Night Cycle<br>" +
-            "Please note that the Moon Effects are only available when the game language is set to English; a fix is being investigated.<br><br>" +
+            "Please note that the Moon Effects are only available when the game language is set to English.<br><br>" +
             "This message will not be shown again.<br><br>" +
             "All the best,<br>SDoehren<br>Discord Server: https://discord.gg/QNQZwGGxuN"
         ChatMessage.create({whisper:ChatMessage.getWhisperRecipients("GM"),content: message,speaker:ChatMessage.getSpeaker({alias: "Day Night Cycle"})}, {});
@@ -329,8 +329,8 @@ function updatelighting(sceneid,timestamp){
     let hoursinday = SimpleCalendar.api.getTimeConfiguration().hoursInDay;
     let minutesinhour = SimpleCalendar.api.getTimeConfiguration().minutesInHour;
 
-    let lastS = 1 - scenedataobj.darkness;
-    let visioncutoff = 1 - scenedataobj.globalLightThreshold;
+    let lastS = 1 - scenedataobj.environment.darknessLevel;
+    let visioncutoff = 1 - scenedataobj.environment.globalLight.darkness.max;
 
     function score(sd, mean, X) {
         return (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * (((X - mean) / sd) ** 2))

@@ -1,5 +1,10 @@
 # Change Log
 
+#### 0009 - Bug Fix
+
+- Darkness Depreciation Warning Fixed
+
+
 #### 0008 - V12 Compatibility
 
 - V12 Compatibility

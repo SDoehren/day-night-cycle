@@ -2,7 +2,7 @@
   "name": "day-night-cycle",
   "title": "Day Night Cycle",
   "description": "Day Night Cycle automatically changes the lighting levels to reflect the time of day based on the time in Simple Calendar.",
-  "version": "0008",
+  "version": "0009",
   "authors": [{"name": "SDoehren"}],
   "esmodules": ["src/day-night-cycle.js"],
   "compatibility": {

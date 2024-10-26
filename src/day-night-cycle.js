@@ -43,7 +43,7 @@ Hooks.on("ready", () => {
 
 Hooks.on("renderSceneConfig", (sheet, html, data) => {
 
-    let DNCflags = sheet.object.data.flags["day-night-cycle"]
+    let DNCflags = sheet.object.flags["day-night-cycle"];
     let currentactiveflag;
     let activechecked;
     let defaultchecked;
@@ -126,7 +126,8 @@ Hooks.on("renderSceneConfig", (sheet, html, data) => {
 
 
 
-    html.find(`input[name="globalLightThreshold"]`).parent().parent().after(`\
+    html.find(`range-picker[name="environment.globalLight.darkness.max"]`).parent().parent().after(`\
+<hr />
 <div class="form-group">
     <label>Day Night Cycle</label>
     <div class="form-fields">
@@ -185,6 +186,7 @@ Hooks.on("renderSceneConfig", (sheet, html, data) => {
     </div>
     <p class="notes">For worlds that do not reach full light.</p>
 </div>
+<hr />
 `);
 
 })
